@@ -24,10 +24,10 @@ modules:
    #build-parameters:
       #builder: grunt
    requires:
-    - name: uaa_indicator_suite
+    - name: uaa_indicator_suite_zpluginReimpresionStu
 
 resources:
- - name: uaa_indicator_suite
+ - name: uaa_indicator_suite_zpluginReimpresionStu
    parameters:
       path: ./xs-security.json
       service-plan: application
