@@ -23,7 +23,10 @@ sap.ui.define([
 			this.addSwitch(oPropertyFormContainer, "closeButtonVisible", oData);
 						
 			this.addInputField(oPropertyFormContainer, "title", oData);
-			this.addInputField(oPropertyFormContainer, "text", oData);
+
+			// Custom POD: plant can't be read from oPODParams, so let POD Designer configure
+			// the plant this POD instance is deployed to (PODs are plant-scoped configuration).
+			this.addInputField(oPropertyFormContainer, "defaultPlant", oData);
 
             oFormContainer = oPropertyFormContainer;
 		},
@@ -34,7 +37,7 @@ sap.ui.define([
 				"backButtonVisible": true,
 				"closeButtonVisible": true,
                 "title": "zpluginReimpresionStu",
-				"text": "zpluginReimpresionStu"
+				"defaultPlant": ""
                 
 			};
 		}

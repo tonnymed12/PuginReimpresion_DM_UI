@@ -38,7 +38,62 @@ height="100%">
             </Toolbar>
         </headerToolbar>
         <content> 
-            <Text id="textPlugin" text="template" class="textFontSize" textAlign="Center" width="100%"/>
+            <l:VerticalLayout width="100%">
+                <HBox width="auto" alignItems="Center" wrap="Wrap" class="sapUiSmallMarginTop sapUiSmallMarginBeginEnd">
+                    <Label text="{i18n>plant}" class="sapUiTinyMarginEnd" />
+                    <Input id="filterPlant" width="90px" value="{tableModel>/filterPlant}" class="sapUiSmallMarginEnd" />
+                    <Label text="{i18n>workCenter}" class="sapUiTinyMarginEnd" />
+                    <Input id="filterWorkCenter" width="90px" value="{tableModel>/filterWorkCenter}" class="sapUiSmallMarginEnd" />
+                    <Label text="{i18n>order}" class="sapUiTinyMarginEnd" />
+                    <Input id="filterOrder" width="100px" value="{tableModel>/filterOrder}" submit="onSearchOrder" class="sapUiSmallMarginEnd" />
+                    <Button text="{i18n>search}" icon="sap-icon://search" press="onSearchOrder" />
+                </HBox>
+
+                <Table busyIndicatorDelay="5" id="labelTable" items="{tableModel>/ITEMS}"
+                class="sapUiSmallMarginTop" width="100%" alternateRowColors="true">
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="{i18n>Items} ({= ${tableModel>/ITEMS}.length})" />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column width="18%" hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>lotes}" />
+                    </Column>
+                    <Column width="10%" hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>orden}" />
+                    </Column>
+                    <Column width="12%" hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>cantidadPosteada}" />
+                    </Column>
+                    <Column width="10%" hAlign="Center" vAlign="Middle" visible="{tableModel>/isSlitterWorkCenter}">
+                        <Text text="{i18n>etiquetas}" />
+                    </Column>
+                    <Column width="18%" hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>fechaPosteo}" />
+                    </Column>
+                    <Column width="16%" hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>usuario}" />
+                    </Column>
+                    <Column width="10%" hAlign="Center" vAlign="Middle">
+                        <Text text="{i18n>impresion}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem vAlign="Middle">
+                        <cells>
+                            <ObjectIdentifier title="{tableModel>batchNumber}" text="{tableModel>material}" />
+                            <Text text="{tableModel>order}" />
+                            <ObjectAttribute text="{tableModel>quantityValue} {tableModel>uom}" />
+                            <Input type="Number" value="{tableModel>labelQty}" width="80px" placeholder="Pzas./Etiq." />
+                            <Text text="{tableModel>postingDateTime}" />
+                            <Text text="{tableModel>postedBy}" />
+                            <Button icon="sap-icon://print" press=".onPrint"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+            </l:VerticalLayout>
         </content>
 	    </Panel>		
         
