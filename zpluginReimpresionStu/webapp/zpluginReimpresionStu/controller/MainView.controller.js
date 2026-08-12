@@ -237,7 +237,7 @@ sap.ui.define([
 							: "",
 						inWorkCenter: sWorkCenter,
 						inWorkCenterType: sTipoPuesto,
-						inUser: oUserInfo.USER_ID,
+						inUser: oRowData.postedBy,
 						// This custom POD doesn't distinguish slitter work centers; backend still expects the flag
 						inFlagSlitter: false,
 						inQuantityKG: sUom === "KG" ? nQty : 0,
