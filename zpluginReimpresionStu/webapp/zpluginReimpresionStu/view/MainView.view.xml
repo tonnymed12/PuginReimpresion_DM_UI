@@ -43,7 +43,7 @@ height="100%">
                     <Label text="{i18n>plant}" class="sapUiTinyMarginEnd" />
                     <Input id="filterPlant" width="90px" value="{tableModel>/filterPlant}" class="sapUiSmallMarginEnd" enabled="false" />
                     <Label text="{i18n>workCenter}" class="sapUiTinyMarginEnd" />
-                    <Input id="filterWorkCenter" width="90px" value="{tableModel>/filterWorkCenter}" class="sapUiSmallMarginEnd" />
+                    <Input id="filterWorkCenter" width="90px" value="{tableModel>/filterWorkCenter}" class="sapUiSmallMarginEnd" enabled="false" />
                     <Label text="{i18n>order}" class="sapUiTinyMarginEnd" />
                     <Input id="filterOrder" width="100px" value="{tableModel>/filterOrder}" submit="onSearchOrder" class="sapUiSmallMarginEnd" />
                     <Button text="{i18n>search}" icon="sap-icon://search" press="onSearchOrder" />

@@ -16,7 +16,7 @@ sap.ui.define([
 			PluginViewController.prototype.onInit.apply(this, arguments);
 			this.cache = {};
 
-			// Custom POD: plant/work center/order are captured manually below instead of oPODParams
+			// Custom POD: plant/order are captured manually; work center is autofilled from the order's workCenters[0]
 			var oTableModel = new JSONModel({
 				ITEMS: [],
 				filterPlant: "",
@@ -53,7 +53,7 @@ sap.ui.define([
 
 		/**
 		 * Triggered by the "Buscar" action (button press or order input submit).
-		 * Validates the manually captured plant/order (work center is not needed to search), then resolves
+		 * Validates the manually captured plant/order (work center is autofilled from the order), then resolves
 		 * child orders and searches.
 		 */
 		onSearchOrder: function () {
@@ -91,6 +91,11 @@ sap.ui.define([
 					if (!oOrder) {
 						sap.m.MessageToast.show("Orden no encontrada");
 						return;
+					}
+
+					// Autofill work center from the order header; keep any manually captured value if absent
+					if (Array.isArray(oOrder.workCenters) && oOrder.workCenters.length > 0) {
+						oThis.getView().getModel("tableModel").setProperty("/filterWorkCenter", oOrder.workCenters[0].workCenter || "");
 					}
 
 					var aCustomValues = oOrder.customValues || [];
@@ -184,7 +189,7 @@ sap.ui.define([
 		/**
 		 * Handles the print action for a table row.
 		 * Fetches the work center's TIPO_PUESTO custom value, then calls the impresion PP endpoint.
-		 * Plant/work center now come from the manually captured filters instead of oPODParams.
+		 * Plant comes from the manually captured filter; work center is autofilled from the order but still read here.
 		 * @param {sap.ui.base.Event} oEvent  Button press event
 		 */
 		onPrint: function (oEvent) {
@@ -197,7 +202,7 @@ sap.ui.define([
 			var oRowData = oBindingContext.getObject();
 			var sRowPath = oBindingContext.getPath();
 			var oSapApi = this.getPublicApiRestDataSourceUri();
-			// Work center is read and validated here at print time, not cached from the search step
+			// Work center is autofilled from the order's workCenters[0]; still validated here as a safety net
 			var sWorkCenter = (oTableModel.getProperty("/filterWorkCenter") || "").trim();
 
 			if (!sWorkCenter) {
