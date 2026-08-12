@@ -19,7 +19,6 @@ sap.ui.define([
 			// Custom POD: plant/work center/order are captured manually below instead of oPODParams
 			var oTableModel = new JSONModel({
 				ITEMS: [],
-				searchWorkCenter: "",
 				filterPlant: "",
 				filterWorkCenter: "",
 				filterOrder: ""
@@ -54,29 +53,22 @@ sap.ui.define([
 
 		/**
 		 * Triggered by the "Buscar" action (button press or order input submit).
-		 * Validates the manually captured plant/work center/order, then resolves
+		 * Validates the manually captured plant/order (work center is not needed to search), then resolves
 		 * child orders and searches.
 		 */
 		onSearchOrder: function () {
 			var oTableModel = this.getView().getModel("tableModel");
 			var sPlant = (oTableModel.getProperty("/filterPlant") || "").trim();
-			var sWorkCenter = (oTableModel.getProperty("/filterWorkCenter") || "").trim();
 			var sOrder = (oTableModel.getProperty("/filterOrder") || "").trim();
 
 			if (!sPlant) {
 				sap.m.MessageToast.show("Ingrese la planta");
 				return;
 			}
-			if (!sWorkCenter) {
-				sap.m.MessageToast.show("Ingrese el puesto de trabajo");
-				return;
-			}
 			if (!sOrder) {
 				sap.m.MessageToast.show("Ingrese un número de orden");
 				return;
 			}
-
-			oTableModel.setProperty("/searchWorkCenter", sWorkCenter);
 
 			this._resolveOrdersAndSearch(sPlant, sOrder);
 		},
@@ -205,8 +197,13 @@ sap.ui.define([
 			var oRowData = oBindingContext.getObject();
 			var sRowPath = oBindingContext.getPath();
 			var oSapApi = this.getPublicApiRestDataSourceUri();
-			// Use the manually entered work center (resolved once via onSearchOrder)
-			var sWorkCenter = oTableModel.getProperty("/searchWorkCenter");
+			// Work center is read and validated here at print time, not cached from the search step
+			var sWorkCenter = (oTableModel.getProperty("/filterWorkCenter") || "").trim();
+
+			if (!sWorkCenter) {
+				sap.m.MessageToast.show("Ingrese el puesto de trabajo");
+				return;
+			}
 
 			// Retrieve work center custom values to get TIPO_PUESTO
 			this.ajaxGetRequest(oSapApi + this.ApiPaths.WORKCENTERS,

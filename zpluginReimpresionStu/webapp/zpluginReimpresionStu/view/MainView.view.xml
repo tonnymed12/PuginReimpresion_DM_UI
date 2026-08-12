@@ -41,7 +41,7 @@ height="100%">
             <l:VerticalLayout width="100%">
                 <HBox width="auto" alignItems="Center" wrap="Wrap" class="sapUiSmallMarginTop sapUiSmallMarginBeginEnd">
                     <Label text="{i18n>plant}" class="sapUiTinyMarginEnd" />
-                    <Input id="filterPlant" width="90px" value="{tableModel>/filterPlant}" class="sapUiSmallMarginEnd" />
+                    <Input id="filterPlant" width="90px" value="{tableModel>/filterPlant}" class="sapUiSmallMarginEnd" enabled="false" />
                     <Label text="{i18n>workCenter}" class="sapUiTinyMarginEnd" />
                     <Input id="filterWorkCenter" width="90px" value="{tableModel>/filterWorkCenter}" class="sapUiSmallMarginEnd" />
                     <Label text="{i18n>order}" class="sapUiTinyMarginEnd" />
