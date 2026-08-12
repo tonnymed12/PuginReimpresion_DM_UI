@@ -1,0 +1,14 @@
+{
+  "welcomeFile": "/zpluginReimpresionStu/index.html",
+  "authenticationMethod": "none",
+  "logout": {
+    "logoutEndpoint": "/do/logout"
+  },
+  "routes": [
+    {
+      "source": "^/zpluginReimpresionStu/(.*)$",
+      "target": "$1",
+      "localDir": "webapp"
+    }
+  ]
+}

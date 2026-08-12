@@ -1,0 +1,15 @@
+{
+	"components": [
+		{
+			"id": "<%= name %>",
+			"type": "VIEW_PLUGIN",
+			"allowMultipleInstances": false,
+			"name": "<%= namespace %>.<%= name %>.<%= name %>",
+			"propertyEditor": "<%= namespace %>.<%= name %>.<%= name %>.builder.PropertyEditor",
+			"i18n": "<%= namespace %>.<%= name %>.<%= name %>.i18n.i18n",
+            "productionProcessEnabled": true,
+           "productionProcessTitle": "<%= name %>",
+			"supportedPodTypes": <%- podTypes %>
+		}   
+	]
+}
