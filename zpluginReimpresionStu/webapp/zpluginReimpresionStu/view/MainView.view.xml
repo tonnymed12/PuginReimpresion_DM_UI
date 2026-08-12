@@ -50,7 +50,7 @@ height="100%">
                 </HBox>
 
                 <Table busyIndicatorDelay="5" id="labelTable" items="{tableModel>/ITEMS}"
-                class="sapUiSmallMarginTop" width="100%" alternateRowColors="true">
+                class="sapUiSmallMarginTop" width="100%" alternateRowColors="true" noDataText="{i18n>noData}" visibleRowCountMode="Auto">
                 <headerToolbar>
                     <Toolbar>
                         <Title text="{i18n>Items} ({= ${tableModel>/ITEMS}.length})" />
