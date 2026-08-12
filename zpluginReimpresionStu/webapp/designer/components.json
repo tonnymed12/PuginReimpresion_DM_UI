@@ -9,7 +9,7 @@
 			"i18n": "serviacero.custom.plugins.zpluginReimpresionStu.zpluginReimpresionStu.i18n.i18n",
             "productionProcessEnabled": true,
            "productionProcessTitle": "zpluginReimpresionStu",
-			"supportedPodTypes": ["WORK_CENTER","OPERATION","ORDER"]
+			"supportedPodTypes": ["WORK_CENTER","OPERATION","ORDER","OTHER"]
 		}   
 	]
 }

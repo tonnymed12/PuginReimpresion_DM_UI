@@ -34,10 +34,10 @@ sap.ui.define([
 		getDefaultPropertyData: function(){
 			return {
 				
-				"backButtonVisible": true,
-				"closeButtonVisible": true,
+				"backButtonVisible": false,
+				"closeButtonVisible": false,
                 "title": "zpluginReimpresionStu",
-				"defaultPlant": ""
+				"defaultPlant": "1201"
                 
 			};
 		}
