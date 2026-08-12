@@ -8,9 +8,6 @@ sap.ui.define([
 ], function (jQuery, PluginViewController, JSONModel, MessageToast, Commons, ApiPaths) {
 	"use strict";
 
-	// Same slitter work center rule as the reference plugin (zpluginReimpresion)
-	var SLITTER_WORKCENTERS = ["PI01", "EF01", "EF02"];
-
 	return PluginViewController.extend("serviacero.custom.plugins.zpluginReimpresionStu.zpluginReimpresionStu.controller.MainView", {
 		Commons: Commons,
 		ApiPaths: ApiPaths,
@@ -22,7 +19,6 @@ sap.ui.define([
 			// Custom POD: plant/work center/order are captured manually below instead of oPODParams
 			var oTableModel = new JSONModel({
 				ITEMS: [],
-				isSlitterWorkCenter: false,
 				searchWorkCenter: "",
 				filterPlant: "",
 				filterWorkCenter: "",
@@ -58,8 +54,8 @@ sap.ui.define([
 
 		/**
 		 * Triggered by the "Buscar" action (button press or order input submit).
-		 * Validates the manually captured plant/work center/order, sets the slitter
-		 * flag from the entered work center, then resolves child orders and searches.
+		 * Validates the manually captured plant/work center/order, then resolves
+		 * child orders and searches.
 		 */
 		onSearchOrder: function () {
 			var oTableModel = this.getView().getModel("tableModel");
@@ -80,9 +76,7 @@ sap.ui.define([
 				return;
 			}
 
-			var bIsSlitter = SLITTER_WORKCENTERS.indexOf(sWorkCenter) !== -1;
 			oTableModel.setProperty("/searchWorkCenter", sWorkCenter);
-			oTableModel.setProperty("/isSlitterWorkCenter", bIsSlitter);
 
 			this._resolveOrdersAndSearch(sPlant, sOrder);
 		},
@@ -173,8 +167,7 @@ sap.ui.define([
 								sfc: oItem.sfc || "",
 								quantityValue: oQty.value || 0,
 								uom: oQty.internalUnitOfMeasure || "",
-								storageLocation: oItem.storageLocation || "",
-								labelQty: ""
+								storageLocation: oItem.storageLocation || ""
 							});
 						});
 						iPending--;
@@ -214,16 +207,6 @@ sap.ui.define([
 			var oSapApi = this.getPublicApiRestDataSourceUri();
 			// Use the manually entered work center (resolved once via onSearchOrder)
 			var sWorkCenter = oTableModel.getProperty("/searchWorkCenter");
-			var bIsSlitter = SLITTER_WORKCENTERS.indexOf(sWorkCenter) !== -1;
-
-			// For slitter work centers validate that the label quantity was entered
-			if (bIsSlitter) {
-				var nLabelQty = parseFloat(oRowData.labelQty);
-				if (!nLabelQty || nLabelQty <= 0) {
-					sap.m.MessageToast.show("Ingrese la cantidad de piezas por etiqueta");
-					return;
-				}
-			}
 
 			// Retrieve work center custom values to get TIPO_PUESTO
 			this.ajaxGetRequest(oSapApi + this.ApiPaths.WORKCENTERS,
@@ -253,26 +236,16 @@ sap.ui.define([
 						inWorkCenter: sWorkCenter,
 						inWorkCenterType: sTipoPuesto,
 						inUser: oUserInfo.USER_ID,
-						inFlagSlitter: false
+						// This custom POD doesn't distinguish slitter work centers; backend still expects the flag
+						inFlagSlitter: false,
+						inQuantityKG: sUom === "KG" ? nQty : 0,
+						inQuantityPZ: (sUom === "PZ" || sUom === "PC" || sUom === "ST") ? nQty : 0,
+						inQuantityML: sUom === "ML" ? nQty : 0
 					};
-
-					if (bIsSlitter) {
-						// Slitter WCs (PI01/EF01/EF02): inQuantityPZ = pieces per label entered by user
-						oBody.inQuantityKG = 0;
-						oBody.inQuantityML = 0;
-						oBody.inQuantityPZ = parseFloat(oRowData.labelQty);
-						oBody.inFlagSlitter = true;
-					} else {
-						oBody.inQuantityKG = sUom === "KG" ? nQty : 0;
-						oBody.inQuantityPZ = (sUom === "PZ" || sUom === "PC" || sUom === "ST") ? nQty : 0;
-						oBody.inQuantityML = sUom === "ML" ? nQty : 0;
-						oBody.inFlagSlitter = false;
-					}
 
 					oThis.ajaxPostRequest(oSapApi + oThis.ApiPaths.IMPRESION, oBody,
 						function () {
 							sap.m.MessageToast.show("Impresión enviada correctamente");
-							oThis.getView().getModel("tableModel").setProperty(sRowPath + "/labelQty", "");
 							oView.byId("panelPlugin").setBusy(false);
 						},
 						function (oErr, sMsg) {

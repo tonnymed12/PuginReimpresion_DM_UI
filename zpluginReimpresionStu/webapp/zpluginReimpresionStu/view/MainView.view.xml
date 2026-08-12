@@ -66,9 +66,6 @@ height="100%">
                     <Column width="12%" hAlign="Left" vAlign="Middle">
                         <Text text="{i18n>cantidadPosteada}" />
                     </Column>
-                    <Column width="10%" hAlign="Center" vAlign="Middle" visible="{tableModel>/isSlitterWorkCenter}">
-                        <Text text="{i18n>etiquetas}" />
-                    </Column>
                     <Column width="18%" hAlign="Left" vAlign="Middle">
                         <Text text="{i18n>fechaPosteo}" />
                     </Column>
@@ -85,7 +82,6 @@ height="100%">
                             <ObjectIdentifier title="{tableModel>batchNumber}" text="{tableModel>material}" />
                             <Text text="{tableModel>order}" />
                             <ObjectAttribute text="{tableModel>quantityValue} {tableModel>uom}" />
-                            <Input type="Number" value="{tableModel>labelQty}" width="80px" placeholder="Pzas./Etiq." />
                             <Text text="{tableModel>postingDateTime}" />
                             <Text text="{tableModel>postedBy}" />
                             <Button icon="sap-icon://print" press=".onPrint"/>
