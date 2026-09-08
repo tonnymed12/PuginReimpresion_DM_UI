@@ -1,5 +1,5 @@
 sap.ui.define([
-    'jquery.sap.global',
+	'jquery.sap.global',
 	"sap/dm/dme/podfoundation/controller/PluginViewController",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
@@ -25,23 +25,24 @@ sap.ui.define([
 			});
 			this.getView().setModel(oTableModel, "tableModel");
 		},
-        onAfterRendering: function(){
-           
-            this.getView().byId("backButton").setVisible(this.getConfiguration().backButtonVisible);
-            this.getView().byId("closeButton").setVisible(this.getConfiguration().closeButtonVisible);
-            this.getView().byId("headerTitle").setText(this.getConfiguration().title);
+		onAfterRendering: function () {
 
-        },
-
-		onBeforeRenderingPlugin: function () {
+			this.getView().byId("backButton").setVisible(this.getConfiguration().backButtonVisible);
+			this.getView().byId("closeButton").setVisible(this.getConfiguration().closeButtonVisible);
+			this.getView().byId("headerTitle").setText(this.getConfiguration().title);
+			
 			// Custom POD: no order/phase selection flow exists, so PLANT_ID/WORK_CENTER/ORDER_ID
 			// from oPODParams are not available here. Prefill plant from POD Designer config
 			// (defaultPlant property) or a best-effort context read; everything else stays manual.
 			var oTableModel = this.getView().getModel("tableModel");
 			var plant = this.getPodController().getUserPlant();
-            this.byId("inputPlant").setValue(plant);
-			
+			this.byId("inputPlant").setValue(plant);
+
 			oTableModel.setProperty("/filterPlant", plant);
+		},
+
+		onBeforeRenderingPlugin: function () {
+
 		},
 
 		/**
@@ -256,49 +257,49 @@ sap.ui.define([
 			);
 		},
 
-        isSubscribingToNotifications: function() {
-            
-            var bNotificationsEnabled = true;
-           
-            return bNotificationsEnabled;
-        },
+		isSubscribingToNotifications: function () {
+
+			var bNotificationsEnabled = true;
+
+			return bNotificationsEnabled;
+		},
 
 
-        getCustomNotificationEvents: function(sTopic) {
-            //return ["template"];
-        },
+		getCustomNotificationEvents: function (sTopic) {
+			//return ["template"];
+		},
 
 
-        getNotificationMessageHandler: function(sTopic) {
+		getNotificationMessageHandler: function (sTopic) {
 
-            //if (sTopic === "template") {
-            //    return this._handleNotificationMessage;
-            //}
-            return null;
-        },
+			//if (sTopic === "template") {
+			//    return this._handleNotificationMessage;
+			//}
+			return null;
+		},
 
-        _handleNotificationMessage: function(oMsg) {
-           
-            var sMessage = "Message not found in payload 'message' property";
-            if (oMsg && oMsg.parameters && oMsg.parameters.length > 0) {
-                for (var i = 0; i < oMsg.parameters.length; i++) {
+		_handleNotificationMessage: function (oMsg) {
 
-                    switch (oMsg.parameters[i].name){
-                        case "template":
-                            
-                            break;
-                        case "template2":
-                            
-                        
-                        }        
-          
+			var sMessage = "Message not found in payload 'message' property";
+			if (oMsg && oMsg.parameters && oMsg.parameters.length > 0) {
+				for (var i = 0; i < oMsg.parameters.length; i++) {
 
-                    
-                }
-            }
+					switch (oMsg.parameters[i].name) {
+						case "template":
 
-        },
-        
+							break;
+						case "template2":
+
+
+					}
+
+
+
+				}
+			}
+
+		},
+
 
 		onExit: function () {
 			PluginViewController.prototype.onExit.apply(this, arguments);
