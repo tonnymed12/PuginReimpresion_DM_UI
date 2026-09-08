@@ -16,7 +16,7 @@ sap.ui.define([
 			PluginViewController.prototype.onInit.apply(this, arguments);
 			this.cache = {};
 
-			// Custom POD: plant/order are captured manually; work center is autofilled from the order's workCenters[0]
+			// Custom POD: plant always comes from the POD context (getUserPlant); order is captured manually; work center is autofilled from the order's workCenters[0]
 			var oTableModel = new JSONModel({
 				ITEMS: [],
 				filterPlant: "",
@@ -26,19 +26,17 @@ sap.ui.define([
 			this.getView().setModel(oTableModel, "tableModel");
 		},
 		onAfterRendering: function () {
+			// filterPlant is display-only (bound, disabled input); the POD context is the single source of truth
+			this.getView().getModel("tableModel").setProperty("/filterPlant", this._getPlant());
+		},
 
-			this.getView().byId("backButton").setVisible(this.getConfiguration().backButtonVisible);
-			this.getView().byId("closeButton").setVisible(this.getConfiguration().closeButtonVisible);
-			this.getView().byId("headerTitle").setText(this.getConfiguration().title);
-			
-			// Custom POD: no order/phase selection flow exists, so PLANT_ID/WORK_CENTER/ORDER_ID
-			// from oPODParams are not available here. Prefill plant from POD Designer config
-			// (defaultPlant property) or a best-effort context read; everything else stays manual.
-			var oTableModel = this.getView().getModel("tableModel");
-			var plant = this.getPodController().getUserPlant();
-			this.byId("inputPlant").setValue(plant);
-
-			oTableModel.setProperty("/filterPlant", plant);
+		/**
+		 * Returns the plant from the POD selection context. This is the only source of truth for plant;
+		 * it must never be read from a user-editable model property.
+		 * @returns {string} Trimmed plant code, or "" if the POD context has none.
+		 */
+		_getPlant: function () {
+			return (this.getPodController().getUserPlant() || "").trim();
 		},
 
 		onBeforeRenderingPlugin: function () {
@@ -47,16 +45,16 @@ sap.ui.define([
 
 		/**
 		 * Triggered by the "Buscar" action (button press or order input submit).
-		 * Validates the manually captured plant/order (work center is autofilled from the order), then resolves
-		 * child orders and searches.
+		 * Plant is sourced from the POD context (never from a user-editable model property); order is captured
+		 * manually (work center is autofilled from the order). Resolves child orders and searches.
 		 */
 		onSearchOrder: function () {
 			var oTableModel = this.getView().getModel("tableModel");
-			var sPlant = (oTableModel.getProperty("/filterPlant") || "").trim();
+			var sPlant = this._getPlant();
 			var sOrder = (oTableModel.getProperty("/filterOrder") || "").trim();
 
 			if (!sPlant) {
-				sap.m.MessageToast.show("Ingrese la planta");
+				sap.m.MessageToast.show("No se pudo obtener la planta del POD");
 				return;
 			}
 			if (!sOrder) {
@@ -64,6 +62,7 @@ sap.ui.define([
 				return;
 			}
 
+			oTableModel.setProperty("/filterPlant", sPlant);
 			this._resolveOrdersAndSearch(sPlant, sOrder);
 		},
 
@@ -71,7 +70,7 @@ sap.ui.define([
 		 * Reads order custom values to determine which orders to query for goods receipts.
 		 * For combined orders, deliveries are made in child orders (ORDENES_HIJAS).
 		 * Same business rule as the reference plugin's onGetOrderCustomValues.
-		 * @param {string} sPlant  Manually entered plant
+		 * @param {string} sPlant  Plant from the POD context
 		 * @param {string} sOrder  Manually entered order
 		 */
 		_resolveOrdersAndSearch: function (sPlant, sOrder) {
@@ -183,14 +182,15 @@ sap.ui.define([
 		/**
 		 * Handles the print action for a table row.
 		 * Fetches the work center's TIPO_PUESTO custom value, then calls the impresion PP endpoint.
-		 * Plant comes from the manually captured filter; work center is autofilled from the order but still read here.
+		 * Plant comes strictly from the POD context (safety-net revalidated here); work center is autofilled
+		 * from the order but still read/validated here.
 		 * @param {sap.ui.base.Event} oEvent  Button press event
 		 */
 		onPrint: function (oEvent) {
 			var oThis = this;
 			var oView = this.getView();
 			var oTableModel = oView.getModel("tableModel");
-			var sPlant = (oTableModel.getProperty("/filterPlant") || "").trim();
+			var sPlant = this._getPlant();
 			var oUserInfo = this.Commons.getGlobalUserInfo(this.getOwnerComponent());
 			var oBindingContext = oEvent.getSource().getBindingContext("tableModel");
 			var oRowData = oBindingContext.getObject();
@@ -199,6 +199,10 @@ sap.ui.define([
 			// Work center is autofilled from the order's workCenters[0]; still validated here as a safety net
 			var sWorkCenter = (oTableModel.getProperty("/filterWorkCenter") || "").trim();
 
+			if (!sPlant) {
+				sap.m.MessageToast.show("No se pudo obtener la planta del POD");
+				return;
+			}
 			if (!sWorkCenter) {
 				sap.m.MessageToast.show("Ingrese el puesto de trabajo");
 				return;

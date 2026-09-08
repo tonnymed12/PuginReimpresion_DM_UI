@@ -19,8 +19,7 @@ sap.ui.define([
 		addPropertyEditorContent: function(oPropertyFormContainer){
 			var oData = this.getPropertyData();
 			
-			this.addSwitch(oPropertyFormContainer, "backButtonVisible", oData);
-			this.addSwitch(oPropertyFormContainer, "closeButtonVisible", oData);	
+			this.addInputField(oPropertyFormContainer, "AutoRefresh", oData);	
 			this.addInputField(oPropertyFormContainer, "title", oData);
 
             oFormContainer = oPropertyFormContainer;
@@ -28,11 +27,8 @@ sap.ui.define([
 		
 		getDefaultPropertyData: function(){
 			return {
-				
-				"backButtonVisible": false,
-				"closeButtonVisible": false,
+				"AutoRefresh": 5,
                 "title": "zpluginReimpresionStu"
-                
 			};
 		}
 
