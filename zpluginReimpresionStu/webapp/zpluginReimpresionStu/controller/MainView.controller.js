@@ -45,8 +45,10 @@ sap.ui.define([
 			var oTableModel = this.getView().getModel("tableModel");
 			var sConfiguredPlant = (this.getConfiguration() && this.getConfiguration().defaultPlant) || "";
 			var sPlant = sConfiguredPlant || this.Commons.tryGetContextPlant(this.getOwnerComponent());
-
-			if (sPlant) {
+			var sPlantFromParams = (this.getPODParams() && this.getPODParams().PLANT_ID) || "";
+			if (sPlantFromParams) {
+				oTableModel.setProperty("/filterPlant", sPlantFromParams);
+			} else if (sPlant) {
 				oTableModel.setProperty("/filterPlant", sPlant);
 			}
 		},
