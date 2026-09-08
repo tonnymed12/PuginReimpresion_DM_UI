@@ -25,15 +25,10 @@ sap.ui.define([
 			});
 			this.getView().setModel(oTableModel, "tableModel");
 		},
-
-
-
-
         onAfterRendering: function(){
            
             this.getView().byId("backButton").setVisible(this.getConfiguration().backButtonVisible);
             this.getView().byId("closeButton").setVisible(this.getConfiguration().closeButtonVisible);
-            
             this.getView().byId("headerTitle").setText(this.getConfiguration().title);
 
         },
@@ -43,14 +38,10 @@ sap.ui.define([
 			// from oPODParams are not available here. Prefill plant from POD Designer config
 			// (defaultPlant property) or a best-effort context read; everything else stays manual.
 			var oTableModel = this.getView().getModel("tableModel");
-			var sConfiguredPlant = (this.getConfiguration() && this.getConfiguration().defaultPlant) || "";
-			var sPlant = sConfiguredPlant || this.Commons.tryGetContextPlant(this.getOwnerComponent());
-			var sPlantFromParams = (this.getPODParams() && this.getPODParams().PLANT_ID) || "";
-			if (sPlantFromParams) {
-				oTableModel.setProperty("/filterPlant", sPlantFromParams);
-			} else if (sPlant) {
-				oTableModel.setProperty("/filterPlant", sPlant);
-			}
+			var plant = this.getPodController().getUserPlant();
+            this.byId("inputPlant").setValue(plant);
+			
+			oTableModel.setProperty("/filterPlant", plant);
 		},
 
 		/**
