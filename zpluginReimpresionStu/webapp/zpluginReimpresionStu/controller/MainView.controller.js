@@ -172,6 +172,8 @@ sap.ui.define([
 					function (oData) {
 						var aContent = (oData && oData.content) ? oData.content : [];
 						aContent.forEach(function (oReceipt) {
+							// Skip cancelled or otherwise not-posted receipts
+							if (oReceipt.status !== "POSTED_TO_TARGET_SYS") { return; }
 							var oItem = (oReceipt.items && oReceipt.items[0]) || {};
 							// Skip receipts without a batch number
 							if (!oItem.batchNumber) { return; }
