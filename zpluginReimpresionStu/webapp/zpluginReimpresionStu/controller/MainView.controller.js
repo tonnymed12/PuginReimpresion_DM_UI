@@ -137,8 +137,19 @@ sap.ui.define([
 				return;
 			}
 
-			aOrders.forEach(function (sOrder) {
-				oThis.ajaxGetRequest(url, { plant: sPlant, order: sOrder },
+			var finishOrder = function () {
+				iPending--;
+				if (iPending === 0) {
+					aAllReceipts.sort(function (a, b) {
+						return new Date(b.postingDateTime) - new Date(a.postingDateTime);
+					});
+					oView.getModel("tableModel").setProperty("/ITEMS", aAllReceipts);
+				}
+			};
+
+			// The API is paginated (default 20, max size 500); fetch every page of each order
+			var fetchPage = function (sOrder, iPage) {
+				oThis.ajaxGetRequest(url, { plant: sPlant, order: sOrder, page: iPage, size: 500 },
 					function (oData) {
 						var aContent = (oData && oData.content) ? oData.content : [];
 						aContent.forEach(function (oReceipt) {
@@ -160,22 +171,21 @@ sap.ui.define([
 								storageLocation: oItem.storageLocation || ""
 							});
 						});
-						iPending--;
-						if (iPending === 0) {
-							aAllReceipts.sort(function (a, b) {
-								return new Date(b.postingDateTime) - new Date(a.postingDateTime);
-							});
-							oView.getModel("tableModel").setProperty("/ITEMS", aAllReceipts);
+						if (oData && oData.last === false && iPage + 1 < (oData.totalPages || 0)) {
+							fetchPage(sOrder, iPage + 1);
+						} else {
+							finishOrder();
 						}
 					},
 					function (oError, sHttpErrorMessage) {
-						iPending--;
-						if (iPending === 0) {
-							oView.getModel("tableModel").setProperty("/ITEMS", aAllReceipts);
-						}
 						sap.m.MessageToast.show(oError || sHttpErrorMessage);
+						finishOrder();
 					}
 				);
+			};
+
+			aOrders.forEach(function (sOrder) {
+				fetchPage(sOrder, 0);
 			});
 		},
 
