@@ -39,6 +39,25 @@ sap.ui.define([
 			return (this.getPodController().getUserPlant() || "").trim();
 		},
 
+		/**
+		 * Extracts a readable message from an API error (object, JSON string or plain text).
+		 * @param {object|string} vError  Error payload received by the ajax error callback
+		 * @param {string} sFallback  Message to use when vError carries none
+		 * @returns {string}
+		 */
+		_getErrorMessage: function (vError, sFallback) {
+			var oError = vError;
+			if (typeof oError === "string") {
+				try { oError = JSON.parse(oError); } catch (e) { return oError || sFallback || ""; }
+			}
+			if (oError && typeof oError === "object") {
+				if (oError.message) { return oError.message; }
+				if (oError.responseJSON && oError.responseJSON.message) { return oError.responseJSON.message; }
+				if (oError.error && oError.error.message) { return oError.error.message; }
+			}
+			return sFallback || "";
+		},
+
 		onBeforeRenderingPlugin: function () {
 
 		},
@@ -115,7 +134,7 @@ sap.ui.define([
 					oThis.goodsRceiptsSummaryOrder(sPlant, aOrdenesAConsultar);
 				},
 				function (oError, sHttpErrorMessage) {
-					sap.m.MessageToast.show(oError || sHttpErrorMessage);
+					sap.m.MessageToast.show(oThis._getErrorMessage(oError, sHttpErrorMessage));
 				}
 			);
 		},
@@ -178,7 +197,7 @@ sap.ui.define([
 						}
 					},
 					function (oError, sHttpErrorMessage) {
-						sap.m.MessageToast.show(oError || sHttpErrorMessage);
+						sap.m.MessageToast.show(oThis._getErrorMessage(oError, sHttpErrorMessage));
 						finishOrder();
 					}
 				);
@@ -259,13 +278,13 @@ sap.ui.define([
 							oView.byId("panelPlugin").setBusy(false);
 						},
 						function (oErr, sMsg) {
-							sap.m.MessageToast.show(oErr || sMsg);
+							sap.m.MessageToast.show(oThis._getErrorMessage(oErr, sMsg));
 							oView.byId("panelPlugin").setBusy(false);
 						}
 					);
 				},
 				function (oError, sHttpErrorMessage) {
-					sap.m.MessageToast.show(oError || sHttpErrorMessage);
+					sap.m.MessageToast.show(oThis._getErrorMessage(oError, sHttpErrorMessage));
 					oView.byId("panelPlugin").setBusy(false);
 				}
 			);
