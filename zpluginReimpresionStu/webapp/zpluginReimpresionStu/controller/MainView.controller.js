@@ -48,9 +48,25 @@ sap.ui.define([
 		_getErrorMessage: function (vError, sFallback) {
 			var oError = vError;
 			if (typeof oError === "string") {
-				try { oError = JSON.parse(oError); } catch (e) { return oError || sFallback || ""; }
+				var sRaw = oError;
+				var sClean = sRaw.trim().replace(/^Response=/i, "");
+				try {
+					oError = JSON.parse(sClean);
+				} catch (e1) {
+					try {
+						oError = JSON.parse(sClean.replace(/'/g, "\""));
+					} catch (e2) {
+						// Pseudo-JSON with single quotes: take the last 'message' value
+						var aMatches = sClean.match(/'message'\s*:\s*'([^']*)'/g);
+						if (aMatches && aMatches.length > 0) {
+							return aMatches[aMatches.length - 1].replace(/^'message'\s*:\s*'/, "").replace(/'$/, "");
+						}
+						return sRaw || sFallback || "";
+					}
+				}
 			}
 			if (oError && typeof oError === "object") {
+				if (Array.isArray(oError.details) && oError.details[0] && oError.details[0].message) { return oError.details[0].message; }
 				if (oError.message) { return oError.message; }
 				if (oError.responseJSON && oError.responseJSON.message) { return oError.responseJSON.message; }
 				if (oError.error && oError.error.message) { return oError.error.message; }
@@ -106,8 +122,14 @@ sap.ui.define([
 					}
 
 					// Autofill work center from the order header; keep any manually captured value if absent
-					if (Array.isArray(oOrder.workCenters) && oOrder.workCenters.length > 0) {
-						oThis.getView().getModel("tableModel").setProperty("/filterWorkCenter", oOrder.workCenters[0].workCenter || "");
+					if (Array.isArray(oOrder.workCenters)) {
+						// Work centers starting with "INS" are inspection ones, not the production one
+						var oWorkCenter = oOrder.workCenters.find(function (wc) {
+							return wc && wc.workCenter && !/^INS/i.test(wc.workCenter);
+						});
+						if (oWorkCenter) {
+							oThis.getView().getModel("tableModel").setProperty("/filterWorkCenter", oWorkCenter.workCenter);
+						}
 					}
 
 					var aCustomValues = oOrder.customValues || [];
